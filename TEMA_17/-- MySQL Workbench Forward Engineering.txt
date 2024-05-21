@@ -1,0 +1,110 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema TIENDAINF
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema TIENDAINF
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `TIENDAINF` DEFAULT CHARACTER SET utf8 ;
+USE `TIENDAINF` ;
+
+-- -----------------------------------------------------
+-- Table `TIENDAINF`.`PROVEEDOR`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `TIENDAINF`.`PROVEEDOR` (
+  `id_proveedor` INT NOT NULL,
+  `nombre` VARCHAR(20) NOT NULL,
+  `apellidos` VARCHAR(45) NOT NULL,
+  `direccion` VARCHAR(45) NOT NULL,
+  `provincia` VARCHAR(20) NOT NULL,
+  `telefono` CHAR(9) NOT NULL,
+  PRIMARY KEY (`id_proveedor`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `TIENDAINF`.`PRODUCTO`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `TIENDAINF`.`PRODUCTO` (
+  `id_producto` INT NOT NULL,
+  `descripcion` VARCHAR(45) NOT NULL,
+  `precio` FLOAT NOT NULL,
+  `existencias` INT NULL,
+  `PROVEEDOR_id_proveedor` INT NOT NULL,
+  PRIMARY KEY (`id_producto`, `PROVEEDOR_id_proveedor`),
+  INDEX `fk_PRODUCTO_PROVEEDOR1_idx` (`PROVEEDOR_id_proveedor` ASC) VISIBLE,
+  CONSTRAINT `fk_PRODUCTO_PROVEEDOR1`
+    FOREIGN KEY (`PROVEEDOR_id_proveedor`)
+    REFERENCES `TIENDAINF`.`PROVEEDOR` (`id_proveedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `TIENDAINF`.`CLIENTE`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `TIENDAINF`.`CLIENTE` (
+  `id_cliente` INT NOT NULL,
+  `nombre` VARCHAR(20) NOT NULL,
+  `apellidos` VARCHAR(45) NOT NULL,
+  `direccion` VARCHAR(45) NOT NULL,
+  `telefono` CHAR(9) NOT NULL,
+  PRIMARY KEY (`id_cliente`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `TIENDAINF`.`PRODUCTO_has_CLIENTE`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `TIENDAINF`.`PRODUCTO_has_CLIENTE` (
+  `PRODUCTO_id_producto` INT NOT NULL,
+  `CLIENTE_id_cliente` INT NOT NULL,
+  `fecha_compra` CHAR(8) NOT NULL,
+  PRIMARY KEY (`PRODUCTO_id_producto`, `CLIENTE_id_cliente`),
+  INDEX `fk_PRODUCTO_has_CLIENTE_CLIENTE1_idx` (`CLIENTE_id_cliente` ASC) VISIBLE,
+  INDEX `fk_PRODUCTO_has_CLIENTE_PRODUCTO_idx` (`PRODUCTO_id_producto` ASC) VISIBLE,
+  CONSTRAINT `fk_PRODUCTO_has_CLIENTE_PRODUCTO`
+    FOREIGN KEY (`PRODUCTO_id_producto`)
+    REFERENCES `TIENDAINF`.`PRODUCTO` (`id_producto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_PRODUCTO_has_CLIENTE_CLIENTE1`
+    FOREIGN KEY (`CLIENTE_id_cliente`)
+    REFERENCES `TIENDAINF`.`CLIENTE` (`id_cliente`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+INSERT INTO CLIENTE (id_cliente,nombre,apellidos,direccion,telefono) VALUES
+("01","Juan","Perez Molina","C/ del Fresno 27",677845756),
+("02","Luisa","Mateo Pereira","Av del Circo 22",655987326),
+("03","Francisco","Lopez Lopez","C/ De la Primavera 12",666852456);
+
+INSERT INTO PROVEEDOR (id_proveedor, nombre, apellidos, direccion, provincia, telefono) VALUES
+("01","RUMASA","SA","C/ Pernada 2", "Madrid", 633256978),
+("02","SOUND","CO","C/ Botijo 10", "Cuenca", 666555441),
+("03","INDITEX","SA","Av Mango 11", "Madrid", 610220124);
+
+INSERT INTO PRODUCTO (id_producto,descripcion,precio,existencias,PROVEEDOR_id_proveedor) VALUES
+("01","PC GAMER",999.99,10,"01"),
+("02","Auriculares",25.50,50,"02"),
+("03","Alfombrilla raton",9.25,100,"03");
+
+INSERT INTO PRODUCTO_has_CLIENTE (PRODUCTO_id_producto, CLIENTE_id_cliente, fecha_compra) VALUES
+("01","02","12/01/24"),
+("02","01","10/10/23"),
+("03","02","02/03/22"),
+("01","03","01/10/23");
